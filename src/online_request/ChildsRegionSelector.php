@@ -12,7 +12,7 @@ class ChildsRegionSelector
     protected $add_settlement_type;
     protected $_list;
 
-    public function __construct(ClientInterface $client, string $parentId, $settlement_type = null, $add_settlement_type = 'true')
+    public function __construct(ClientInterface $client, string $parentId, $settlement_type = 'set0', $add_settlement_type = 'true')
     {
         $this->client = $client;
         $this->parentId = $parentId;
@@ -32,13 +32,13 @@ class ChildsRegionSelector
                 ]
             ]);
 
-            foreach (explode('\r\n', $response->getBody()->getContents()) as $line)
-            {
-                list($value, $name) = explode(';', $line, 2);
-                $this->_list[$value] = $name;
-            }
+            foreach (explode("\n", $response->getBody()->getContents()) as $line)
+                if (strpos($line, ';')) {
+                    list($value, $name) = explode(';', $line, 2);
+                    $this->_list[$value] = $name;
+                }
         }
-        
+
         return $this->_list;
     }
 }

@@ -15,7 +15,7 @@ class RosreestrOnlineRequestSelectorTest extends TestCase
             new Response(200, [], '<!DOCTYPE html>
 <html lang="ru" xml:lang="ru">
 <body>
-<select name="o_subject_id" id="oSubjectId" style="background:#FFFFFF;border:solid 1px #828E98;width:300px;height:19px" onfocus="javascript:document.ns_Z7_01HA1A42KODT90AR30VLN22001_searchForm.search_type[2].checked=\'true\';">
+<select name="subject_id" id="oSubjectId" style="background:#FFFFFF;border:solid 1px #828E98;width:300px;height:19px" onfocus="javascript:document.ns_Z7_01HA1A42KODT90AR30VLN22001_searchForm.search_type[2].checked=\'true\';">
                                                 <option disabled="disabled" selected="selected">Выберите субъект</option>
                                                                     <option value="101000000000">Алтайский край</option>
                                                                     <option value="110000000000">Амурская область</option>
