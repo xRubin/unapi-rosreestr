@@ -26,11 +26,11 @@ class ChildsRegionTypeSelector
                 ]
             ]);
 
-            foreach (explode('\r\n', $response->getBody()->getContents()) as $line)
-            {
-                list($value, $name) = explode(';', $line, 2);
-                $this->_list[$value] = $name;
-            }
+            foreach (explode("\n", $response->getBody()->getContents()) as $line)
+                if (strpos($line, ';')) {
+                    list($value, $name) = explode(';', $line, 2);
+                    $this->_list[$value] = $name;
+                }
         }
         
         return $this->_list;
