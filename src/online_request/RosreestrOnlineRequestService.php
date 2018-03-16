@@ -14,7 +14,7 @@ use Psr\Log\NullLogger;
 
 class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInterface
 {
-    /** @var FmsClient */
+    /** @var ClientInterface */
     private $client;
     /** @var LoggerInterface */
     private $logger;
@@ -26,10 +26,10 @@ class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInte
     {
         if (!isset($config['client'])) {
             $this->client = new RosreestrOnlineRequestClient();
-        } elseif ($config['client'] instanceof RosreestrOnlineRequestClient) {
+        } elseif ($config['client'] instanceof ClientInterface) {
             $this->client = $config['client'];
         } else {
-            throw new \InvalidArgumentException('Client must be instance of RosreestrOnlineRequestClient');
+            throw new \InvalidArgumentException('Client must be instance of ClientInterface');
         }
 
         if (!isset($config['logger'])) {
@@ -50,20 +50,23 @@ class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInte
     }
 
     /**
-     * @inheritdoc
+     * @param LoggerInterface $logger
      */
-    public function setLogger(LoggerInterface $logger): void
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    public function getLogger(): LoggerAwareInterface
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
     /**
-     * @param PassportInterface $passport
+     * @param RosreestrOnlineRequestDto $address
      * @return PromiseInterface
      */
     public function getLinks(RosreestrOnlineRequestDto $address): PromiseInterface
@@ -80,7 +83,7 @@ class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInte
             } else
                 return new RejectedPromise('Base href not found');
 
-            return $this->submitForm($this->getClient(), $base . $url, $address)->then(function (ResponseInterface $response) {
+            return $this->submitForm($base . $url, $address)->then(function (ResponseInterface $response) {
 
                 $result = [];
                 $body = $response->getBody()->getContents();
@@ -103,6 +106,10 @@ class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInte
         });
     }
 
+    /**
+     * @param string $url
+     * @return PromiseInterface
+     */
     public function getCadastre(string $url): PromiseInterface
     {
         return $this->client->requestAsync('GET', $url)->then(function (ResponseInterface $response) {
@@ -115,26 +122,29 @@ class RosreestrOnlineRequestService implements ServiceInterface, LoggerAwareInte
         });
     }
 
-
+    /**
+     * @param ClientInterface $client
+     * @return PromiseInterface
+     */
     protected function initialPage(ClientInterface $client)
     {
         return $client->requestAsync('GET', '/wps/portal/p/cc_ib_portal_services/online_request');
     }
 
     /**
-     * @param ClientInterface $client
      * @param string $url
      * @param RosreestrOnlineRequestDto $address
      * @return PromiseInterface
      */
-    protected function submitForm(ClientInterface $client, string $url, RosreestrOnlineRequestDto $address): PromiseInterface
+    protected function submitForm(string $url, RosreestrOnlineRequestDto $address): PromiseInterface
     {
-        return $client->requestAsync('POST', $url, [
+        return $this->getClient()->requestAsync('POST', $url, [
             'form_params' => [
                 'search_action' => 'true',
                 'settlement' => $address->getSettlementId(),
+                'cad_num' => $address->getCadastreNumber(),
                 'start_position' => 59,
-                'search_type' => 'ADDRESS',
+                'search_type' => $address->getCadastreNumber() ? 'CAD_NUMBER' : 'ADDRESS',
                 'subject_id' => $address->getSubjectId(),
                 'region_id' => $address->getRegionId(),
                 'settlement_type' => $address->getSettlementTypeId(),

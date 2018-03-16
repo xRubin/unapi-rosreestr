@@ -5,6 +5,8 @@ namespace unapi\rosreestr\online_request;
 class RosreestrOnlineRequestDto
 {
     /** @var string */
+    protected $cadastre_number;
+    /** @var string */
     protected $subject_id;
     /** @var string */
     protected $region_id;
@@ -22,6 +24,24 @@ class RosreestrOnlineRequestDto
     protected $building;
     /** @var string */
     protected $structure;
+
+    /**
+     * @return string
+     */
+    public function getCadastreNumber(): ?string
+    {
+        return $this->cadastre_number;
+    }
+
+    /**
+     * @param string $cadastre_number
+     * @return RosreestrOnlineRequestDto
+     */
+    public function setCadastreNumber($cadastre_number): RosreestrOnlineRequestDto
+    {
+        $this->cadastre_number = $cadastre_number;
+        return $this;
+    }
 
     /**
      * @return string
@@ -184,5 +204,4 @@ class RosreestrOnlineRequestDto
         $this->structure = $structure;
         return $this;
     }
-
 }
